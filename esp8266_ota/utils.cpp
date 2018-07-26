@@ -29,7 +29,7 @@ void connectWiFi(ConfigStore &configStore)
     int try_count = 0;
     boolean connected = true;
     if (WiFi.status() != WL_CONNECTED) {
-        WiFi.mode(WIFI_AP);
+        WiFi.mode(WIFI_STA);
         WiFi.begin(configStore.wifiSSID, configStore.wifiPass);
         pinMode(LED_PIN, OUTPUT);
         DEBUG_PRINT("Connecting to WiFi.");
@@ -107,14 +107,21 @@ void smartConfig(ConfigStore &configStore)
         delay(10);
         
         if (WiFi.smartConfigDone()) {
+            Serial.print("");
             DEBUG_PRINTF("\r\nSmartConfig Success.");
-            DEBUG_PRINTF("SSID: %s\r\n", WiFi.SSID().c_str());
-            DEBUG_PRINTF("PSW: %s\r\n", WiFi.psk().c_str());
+            // DEBUG_PRINTF("SSID: %s\r\n", WiFi.SSID().c_str());
+            // DEBUG_PRINTF("PSW: %s\r\n", WiFi.psk().c_str());
 
             // 保存配置
             DEBUG_PRINT("Save config...");
-            sprintf(configStore.wifiSSID, "%s", WiFi.SSID().c_str());
-            sprintf(configStore.wifiPass, "%s", WiFi.psk().c_str());
+            // sprintf(configStore.wifiSSID, "%s", WiFi.SSID().c_str());
+            // sprintf(configStore.wifiPass, "%s", WiFi.psk().c_str());
+            memset(configStore.wifiSSID, 0, sizeof(configStore.wifiSSID));
+            memset(configStore.wifiPass, 0, sizeof(configStore.wifiPass));
+            strcpy(configStore.wifiSSID, WiFi.SSID().c_str());
+            strcpy(configStore.wifiPass, WiFi.psk().c_str());
+            DEBUG_PRINTF("SSID: %s\n", configStore.wifiSSID);
+            DEBUG_PRINTF("PSW: %s\n", configStore.wifiPass);
             writeConfig(configStore);
             DEBUG_PRINT("Save config done!");
             WiFi.stopSmartConfig();
@@ -135,13 +142,12 @@ void firmwareUpdate(ConfigStore &configStore)
 {
     DEBUG_PRINTF("Updating firmware -> ");
     t_httpUpdate_return ret = ESPhttpUpdate.update(configStore.cloudHost, configStore.cloudPort, configStore.cloudUpdateUrl, configStore.version);
-    //t_httpUpdate_return ret = ESPhttpUpdate.update("http://192.168.1.101:5000/firmware", fw_VERSION);
+    //t_httpUpdate_return ret = ESPhttpUpdate.update("http://192.168.1.101:5000/firmware", configStore.version);
     //t_httpUpdate_return  ret = ESPhttpUpdate.update("https://server/file.bin");
     
     switch(ret) {
         case HTTP_UPDATE_FAILED:
             DEBUG_PRINT("HTTP_UPDATE_FAILED");
-            // PRINT_PORT.printf("HTTP_UPDATE_FAILED Error (%d): %s\n", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
             break;
 
         case HTTP_UPDATE_NO_UPDATES:
