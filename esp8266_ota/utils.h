@@ -25,26 +25,20 @@
 #define LED_PIN            2    //BUILTIN_LED
 #define BOARD_PWM_MAX      1024
 
-#define fw_VERSION         (const char *)"0.0.1"
-#define fwHost             "192.168.1.108"
-#define fwHostPort          6051    //5000
-#define fwHostUrl           "/firmware/esp8266"
-#define fwHostHasNewUrl     "/hasNewfirmware/"
-
 #define EEPROM_CONFIG_START 0
 
 struct ConfigStore {
     uint32_t  magic;
-    char      version[9];
+    char      version[12];
     uint8_t   flagConfig:1;  // 进入配置模式
     uint8_t   flagApFail:1;  // AP故障
     uint8_t   flagWiFiFail:1; // WiFi断开连接
     uint8_t   flagSelfTest:1;
 
-    char      wifiSSID[34];
-    char      wifiPass[34];
+    char      wifiSSID[32];
+    char      wifiPass[32];
 
-    char      cloudHost[36];
+    char      cloudHost[32];
     uint16_t  cloudPort;
     char      cloudUpdateUrl[64];
     char      cloudFwCheckUrl[64];
@@ -63,13 +57,6 @@ const ConfigStore configDefault = {
     "/firmware/esp8266",
     "/hasNewfirmware/"
 };
-
-// typedef struct{
-//     const char* ssid;
-//     const char* passwd;
-// }netConfig;
-
-// const netConfig netconfig = {"......", "......"};
 
 boolean initConfig(ConfigStore &configStore);
 
@@ -91,8 +78,5 @@ void firmwareUpdate(ConfigStore &configStore);
 
 // 检查固件升级信息
 int checkFirmwareUpdate(ConfigStore &configStore);
-
-// 
-//void handleRoot();
 
 #endif
