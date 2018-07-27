@@ -53,7 +53,7 @@ const ConfigStore configDefault = {
     "",
     "",    
     "192.168.1.108",
-    6051,
+    80,
     "/firmware/esp8266",
     "/hasNewfirmware/"
 };
